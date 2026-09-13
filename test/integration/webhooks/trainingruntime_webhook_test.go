@@ -273,7 +273,7 @@ var _ = ginkgo.Describe("TrainingRuntime marker validations and defaulting", gin
 				},
 				gomega.Succeed(),
 			),
-			ginkgo.Entry("Should fail to create trainingRuntime with a container claim that has no Pod-level resourceClaim",
+			ginkgo.Entry("Rejects creating a TrainingRuntime with a container resources.claim that does not exist in the pod resourceClaims",
 				func() *trainer.TrainingRuntime {
 					baseRuntime := testingutil.MakeTrainingRuntimeWrapper(ns.Name, "runtime")
 					return baseRuntime.
@@ -282,7 +282,7 @@ var _ = ginkgo.Describe("TrainingRuntime marker validations and defaulting", gin
 							Obj()).
 						Obj()
 				},
-				testingutil.BeForbiddenError(),
+				gomega.MatchError(gomega.ContainSubstring("references resourceClaim \"gpu\" which is not defined in the Pod's resourceClaims")),
 			),
 		)
 		ginkgo.DescribeTable("Defaulting TrainingRuntime on creation", func(trainingRuntime func() *trainer.TrainingRuntime, wantTrainingRuntime func() *trainer.TrainingRuntime) {

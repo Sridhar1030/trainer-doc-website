@@ -103,7 +103,7 @@ var _ = ginkgo.Describe("ClusterTrainingRuntime Webhook", ginkgo.Ordered, func()
 						Obj()
 				},
 				gomega.Succeed()),
-			ginkgo.Entry("Should fail to create ClusterTrainingRuntime with a container claim that has no Pod-level resourceClaim",
+			ginkgo.Entry("Rejects creating a ClusterTrainingRuntime with a container resources.claim that does not exist in the pod resourceClaims",
 				func() *trainer.ClusterTrainingRuntime {
 					baseRuntime := testingutil.MakeClusterTrainingRuntimeWrapper(clTrainingRuntimeName)
 					return baseRuntime.
@@ -112,7 +112,7 @@ var _ = ginkgo.Describe("ClusterTrainingRuntime Webhook", ginkgo.Ordered, func()
 							Obj()).
 						Obj()
 				},
-				testingutil.BeForbiddenError()),
+				gomega.MatchError(gomega.ContainSubstring("references resourceClaim \"gpu\" which is not defined in the Pod's resourceClaims"))),
 		)
 	})
 })
